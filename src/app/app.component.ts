@@ -1,12 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit } from "@angular/core";
+import { UserService } from "./user/user.service";
+import { Subscription } from "rxjs";
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  selector: "app-root",
+  templateUrl: "./app.component.html",
+  styleUrls: ["./app.component.css"],
 })
 export class AppComponent implements OnInit {
-  constructor() {}
+  userAcivated = false;
+  private activatedSub: Subscription;
+  constructor(private userService: UserService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.activatedSub = this.userService.activatedEmitter.subscribe(
+      (didActivate) => {
+        this.userAcivated = didActivate;
+      }
+    );
+  }
+  ngOnDestroy() {
+    this.activatedSub.unsubscribe();
+  }
 }

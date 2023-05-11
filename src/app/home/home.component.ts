@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 ("@angular/core");
 import { Observable, Subscription } from "rxjs";
+import { map, filter } from "rxjs/operators";
 import { HttpClient } from "@angular/common/http";
 
 @Component({
@@ -35,20 +36,37 @@ export class HomeComponent implements OnInit {
         count++;
       }, 1000);
     });
-    this.firstObsSubscription = customIntervalObservable.subscribe(
-      //Call api
-      (data: any) => {
-        this.count = data;
-      },
-      //Handle error
-      (err) => {
-        alert(err.message);
-      },
-      //Finish
-      () => {
-        console.log("Completed");
-      }
-    );
+    // customIntervalObservable.pipe(
+    //   map((data: number) => {
+    //     return "Round: " + (data + 1);
+    //   })
+    // );
+    this.firstObsSubscription = customIntervalObservable
+      //Change return value with map
+      .pipe(
+        //Lọc phần tử (Lấy ra các phần tử không cần thiết với filter)
+        filter((data: number) => {
+          return data % 2 === 1;
+        }),
+        //Convert lại dữ liệu với map
+        map((data: number) => {
+          return "Round: " + (data + 1);
+        })
+      )
+      .subscribe(
+        //Call api
+        (data: any) => {
+          this.count = data;
+        },
+        //Handle error
+        (err) => {
+          alert(err.message);
+        },
+        //Finish
+        () => {
+          console.log("Completed");
+        }
+      );
   }
   ngOnDestroy() {
     this.firstObsSubscription.unsubscribe();
